@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <table class="table" id='display'></table>
+
+    <div>
+        <div class="text">Add new user</div>
+        <div class="inputs">
+            <input id="addName" type="text" placeholder="Name">
+            <input id="addEmail" type="text" placeholder="Email">
+            <input id="addUsrName" type="text" placeholder="User name">
+            <button class="button-d" onclick="addUser()">Add</button>
+        </div>
+    </div>
+
+    <div id='modal' class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">X </span>
+            <div class="text">Edit user</div>
+            <input class="input" id="newName" type="text" placeholder="name">
+            <input class="input" id="newEmail" type="text" placeholder="email">
+            <input class="input" id="newUsrName" type="text" placeholder="user name">
+            <button class="button" onclick="editUsr(index)">update</button>
+        </div>
+    </div>
+</body>
+
+<script>
+    const SERVER = 'https://jsonplaceholder.typicode.com/users';
+    let users = [];
+    var index = 0;
+
+    const load = (srv) => axios.get(srv).then((res) => {
+        users = res.data
+        displayGIU()
+    });
+
+    const displayGIU = () => {
+        let temp = `
+        <tr>
+            <th class = "t-head">Name</th>
+            <th class = "t-head">Email</th>
+            <th class = "t-head">User name</th>
+        </tr>
+        `
+        temp += users.map((user, i) => `
+        <tr class = "t-row">
+            <td>${user.name}</td>
+            <td>${user.email}</td>
+            <td>${user.username}</td>
+            <td><button class = "button-t" onclick = "openModal(${i})">✎</button><button class = "button-t" onclick = "delitUsr(${i})">🗑</button></td>
+        </tr>`).join('');
+
+        display.innerHTML = temp
+    }
+
+    const delitUsr = (i) => {
+        users.splice(i, 1)
+        displayGIU()
+    }
+
+    const addUser = () => {
+        if (addName.value != '' && addEmail.value != '' && addUsrName.value != '') {
+            users.push({ 'name': addName.value, 'email': addEmail.value, 'username': addUsrName.value })
+            addName.value = ''
+            addEmail.value = ''
+            addUsrName.value = ''
+            displayGIU()
+        } else {
+            alert('please fill all the data')
+        }
+    }
+
+    const editUsr = () => {
+        if (newName.value != '' && newEmail.value != '' && newUsrName.value != '') {
+            users[index] = { 'name': newName.value, 'email': newEmail.value, 'username': newUsrName.value }
+            closeModal()
+            displayGIU()
+        } else {
+            alert('please fill all the data')
+        }
+    }
+
+    const openModal = (i) => {
+        document.getElementById('modal').style.visibility = 'visible';
+        index = i
+    };
+
+    const closeModal = () => modal.style.visibility = 'hidden';
+
+    load(SERVER)
+</script>
+
+</html>
